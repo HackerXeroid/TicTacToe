@@ -1,4 +1,5 @@
 import controllers.GameController;
+import exceptions.DuplicateSymbolException;
 import exceptions.InvalidMoveException;
 import models.*;
 
@@ -6,15 +7,15 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws InvalidMoveException {
+    public static void main(String[] args) throws InvalidMoveException, DuplicateSymbolException {
         System.out.println("Hello world!");
         Scanner scanner = new Scanner(System.in);
         GameController gameController = new GameController();
 
         int dimension = 3;
         List<Player> players = List.of(
-                new Player("Harsh", new Symbol('X'), PlayerType.HUMAN),
-                new Bot("Scaler", new Symbol('O'), PlayerType.BOT, BotDifficultyLevel.EASY)
+                new Player("Hacker", new Symbol('X'), PlayerType.HUMAN),
+                new Bot("Xeroid", new Symbol('O'), PlayerType.BOT, BotDifficultyLevel.EASY)
         );
 
         Game game = gameController.startGame(dimension, players);
