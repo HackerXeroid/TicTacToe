@@ -1,5 +1,8 @@
 package models;
 
+import exceptions.InvalidMoveException;
+import strategies.WinningAlgorithm;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +13,8 @@ public class Game {
     private GameState gameState;
     private Player winner;
     private int nextPlayerMoveIndex;
+
+    private WinningAlgorithm winningAlgorithm;
 
     public Game(int dimension, List<Player> players) {
         this.board = new Board(dimension);
@@ -70,5 +75,44 @@ public class Game {
 
     public void printBoard() {
         this.board.printBoard();
+    }
+
+    private boolean validateMove(Move move) {
+        int row = move.getCell().getRow();
+        int col = move.getCell().getCol();
+
+        if (row < 0 || row >= board.getSize() || col < 0  || col >= board.getSize()) {
+            return false;
+        }
+
+        return board.getBoard().get(row).get(col).getCellState().equals(CellState.EMPTY);
+    }
+
+    public void makeMove() throws InvalidMoveException {
+        Player currentPlayer = players.get(nextPlayerMoveIndex);
+
+        System.out.println("It is " + currentPlayer.getName() + "'s move.");
+
+        Move move = currentPlayer.makeMove(board);
+
+        if (!validateMove(move)) {
+            throw new InvalidMoveException("Invalid move made by " + currentPlayer.getName());
+        }
+
+        int row = move.getCell().getRow();
+        int col = move.getCell().getCol();
+
+        Cell cellToChange = board.getBoard().get(row).get(col);
+        cellToChange.setPlayer(currentPlayer);
+        cellToChange.setCellState(CellState.FILLED);
+
+        Move finalMove = new Move(cellToChange, currentPlayer);
+        moves.add(finalMove);
+        nextPlayerMoveIndex = (nextPlayerMoveIndex + 1) % players.size();
+
+        if (winningAlgorithm.checkWinner(board, finalMove)) {
+            gameState = GameState.ENDED;
+            winner = currentPlayer;
+        }
     }
 }
